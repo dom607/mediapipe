@@ -40,3 +40,39 @@ cc_binary(
         "//mediapipe/graphs/face_mesh:desktop_live_gpu_calculators",
     ],
 )
+
+# Landmark test.
+cc_binary(
+    name = "face_mesh_cpu_landmark",
+    deps = [
+        "//mediapipe/examples/desktop:demo_run_graph_test",
+        "//mediapipe/graphs/face_mesh:desktop_live_calculators",      
+        "//mediapipe/examples/desktop/face_mesh/calculators:detected_face_count_calculator"
+    ],
+)
+
+# For face mesh library build.
+# CPU / Face landmark only.
+cc_binary(
+    name = "face_mesh_cpu.so",
+    srcs = ["run_face_mesh_graph.cc", "run_face_mesh_graph.h",],
+    visibility = ["//visibility:public"],
+    linkshared = 1,
+    linkstatic = 1,
+    deps = [
+        # Run graph.
+        "//mediapipe/framework:calculator_framework",
+        "//mediapipe/framework/formats:image_frame",
+        "//mediapipe/framework/port:commandlineflags",
+        "//mediapipe/framework/port:file_helpers",
+        "//mediapipe/framework/port:parse_text_proto",
+        "//mediapipe/framework/port:status",
+        # Graph contorl node.
+        "//mediapipe/calculators/core:constant_side_packet_calculator",
+        "//mediapipe/calculators/core:flow_limiter_calculator",
+        # Face landmark calculation module.
+        # This include calculator, graph, tensorflow.
+        "//mediapipe/modules/face_landmark:face_landmark_front_cpu",
+        "//mediapipe/examples/desktop/face_mesh/calculators:detected_face_count_calculator"
+    ],
+)
