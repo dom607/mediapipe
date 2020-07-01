@@ -35,18 +35,12 @@ class DetectedFaceCountCalculator : public CalculatorBase {
     static ::mediapipe::Status GetContract(CalculatorContract* cc) {
         // Check tag.
         RET_CHECK(cc->Inputs().HasTag(kInputImageTag));
-        RET_CHECK(cc->Inputs().HasTag(kInputLandmarksTag));
-        RET_CHECK(cc->Outputs().HasTag(kOutputCountTag));
-
-        // Set Packet type.
-        cc->Inputs().Tag(kInputLandmarksTag).Set<std::vector<NormalizedLandmarkList>>();
         cc->Inputs().Tag(kInputImageTag).Set<ImageFrame>();
+        RET_CHECK(cc->Inputs().HasTag(kInputLandmarksTag));
+        cc->Inputs().Tag(kInputLandmarksTag).Set<std::vector<NormalizedLandmarkList>>();
+        RET_CHECK(cc->Outputs().HasTag(kOutputCountTag));
         cc->Outputs().Tag(kOutputCountTag).Set<int>();
 
-        return ::mediapipe::OkStatus();
-    }
-
-    ::mediapipe::Status Open(CalculatorContext* cc) {
         return ::mediapipe::OkStatus();
     }
 
