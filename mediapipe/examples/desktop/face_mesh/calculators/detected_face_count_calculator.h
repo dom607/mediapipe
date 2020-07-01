@@ -1,3 +1,7 @@
+
+#ifndef MEDIAPIPE_CALCULATORS_FACE_MESH_DETECTED_FACE_COUNT_CALCULATOR_H_
+#define MEDIAPIPE_CALCULATORS_FACE_MESH_DETECTED_FACE_COUNT_CALCULATOR_H_
+
 #include "mediapipe/framework/calculator_framework.h"
 #include "mediapipe/framework/formats/landmark.pb.h"
 #include "mediapipe/framework/formats/image_frame.h"
@@ -19,7 +23,7 @@ namespace mediapipe {
 //   output_stream: "COUNT:face_count"
 // }
 
-constexpr char kInputImageTag[] = "IMGAE";
+constexpr char kInputImageTag[] = "IMAGE";
 constexpr char kInputLandmarksTag[] = "LANDMARKS";
 constexpr char kOutputCountTag[] = "COUNT";
 
@@ -47,17 +51,19 @@ class DetectedFaceCountCalculator : public CalculatorBase {
     }
 
     ::mediapipe::Status Process(CalculatorContext* cc) {
-        const auto& landmarks = cc->Inputs().Tag(kInputLandmarksTag).Get<std::vector<NormalizedLandmarkList>>();
-
-        if (landmarks.size() == 0) {
-            auto output_int = absl::make_unique<int>(0);
-            cc->Outputs().Tag(kOutputCountTag).Add(output_int.release(), cc->InputTimestamp());
+        std::unique_ptr<int> face_count;
+        if (!cc->Inputs().Tag(kInputLandmarksTag).IsEmpty()) {
+            const auto& landmarks = cc->Inputs().Tag(kInputLandmarksTag).Get<std::vector<NormalizedLandmarkList>>();
+            face_count = absl::make_unique<int>(landmarks.size());
         } else {
-            auto output_int = absl::make_unique<int>(landmarks.size());
-            cc->Outputs().Tag(kOutputCountTag).Add(output_int.release(), cc->InputTimestamp());
+            face_count = absl::make_unique<int>(0);
         }
+        cc->Outputs().Tag(kOutputCountTag).Add(face_count.release(), cc->InputTimestamp());
+
+        return ::mediapipe::OkStatus();
     };    
-}
+};
 
 }
 
+#endif  // MEDIAPIPE_CALCULATORS_FACE_MESH_DETECTED_FACE_COUNT_CALCULATOR_H_

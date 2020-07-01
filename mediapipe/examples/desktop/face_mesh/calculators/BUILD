@@ -23,6 +23,7 @@ exports_files(["LICENSE"])
 cc_library(
     name = "detected_face_count_calculator",
     srcs = ["detected_face_count_calculator.cc"],
+    hdrs = ["detected_face_count_calculator.h"],
     visibility = ["//visibility:public"],
     deps = [
         "//mediapipe/framework:calculator_framework",

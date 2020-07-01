@@ -1,6 +1,4 @@
-#include "mediapipe/framework/calculator_framework.h"
-#include "mediapipe/framework/formats/landmark.pb.h"
-#include "mediapipe/framework/formats/image_frame.h"
+#include "mediapipe/examples/desktop/face_mesh/calculators/detected_face_count_calculator.h"
 
 namespace mediapipe {
 
@@ -19,46 +17,6 @@ namespace mediapipe {
 //   output_stream: "COUNT:face_count"
 // }
 
-constexpr char kInputImageTag[] = "IMAGE";
-constexpr char kInputLandmarksTag[] = "LANDMARKS";
-constexpr char kOutputCountTag[] = "COUNT";
-
-class DetectedFaceCountCalculator : public CalculatorBase { 
-  public:
-    static ::mediapipe::Status GetContract(CalculatorContract* cc) {
-        // Check tag.
-        RET_CHECK(cc->Inputs().HasTag(kInputImageTag));
-        RET_CHECK(cc->Inputs().HasTag(kInputLandmarksTag));
-        RET_CHECK(cc->Outputs().HasTag(kOutputCountTag));
-
-        // Set Packet type.
-        cc->Inputs().Tag(kInputLandmarksTag).Set<std::vector<NormalizedLandmarkList>>();
-        cc->Inputs().Tag(kInputImageTag).Set<ImageFrame>();
-        cc->Outputs().Tag(kOutputCountTag).Set<int>();
-
-        return ::mediapipe::OkStatus();
-    }
-
-    ::mediapipe::Status Open(CalculatorContext* cc) final {
-        return ::mediapipe::OkStatus();
-    }
-
-    ::mediapipe::Status Process(CalculatorContext* cc) final {
-
-        LOG(INFO) << "Process";
-
-        if (cc->Inputs().Tag(kInputLandmarksTag).IsEmpty()) {
-            auto output_int = absl::make_unique<int>(0);
-            cc->Outputs().Tag(kOutputCountTag).Add(output_int.release(), cc->InputTimestamp());
-        } else {
-            const auto& landmarks = cc->Inputs().Tag(kInputLandmarksTag).Get<std::vector<NormalizedLandmarkList>>();
-            auto output_int = absl::make_unique<int>(landmarks.size());
-            cc->Outputs().Tag(kOutputCountTag).Add(output_int.release(), cc->InputTimestamp());
-        }
-
-        return ::mediapipe::OkStatus();
-    };    
-};
 REGISTER_CALCULATOR(DetectedFaceCountCalculator);
 }
 
